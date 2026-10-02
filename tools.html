@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLITZ STACK</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="theme.css" rel="stylesheet">
+<style>
+:root {
+  /* BLITZ STACK — ember shifted toward red-orange */
+  --accent: #ff5a3d;
+  --accent-bright: #ff8163;
+  --accent2: #ffb347;
+  --accent2-bright: #ffd08a;
+  --glow-rgb: 255, 90, 61;
+}
+
+/* forced inline override — guarantees this wins even if a cached
+   theme.css is being served, since this lives in the page itself */
+.sticky-nav .search-wrap {
+  width: 420px !important;
+}
+
+/* ---- source-choice modal ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 4, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  position: relative;
+  background: var(--surface, #1c1512);
+  border: 1px solid var(--border, #3a2a20);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-rise 0.2s ease;
+}
+
+@keyframes modal-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #f9efe4;
+  margin-bottom: 4px;
+  padding-right: 30px;
+}
+
+.modal-sub {
+  font-size: 12px;
+  color: #bfa78f;
+  margin-bottom: 20px;
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #3a2a20);
+  background: rgba(255,255,255,0.03);
+  color: #f9efe4;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.modal-opt:hover {
+  border-color: var(--accent, #ff5a3d);
+  background: rgba(var(--glow-rgb, 255,90,61), 0.08);
+  transform: translateY(-1px);
+}
+
+.modal-opt-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-opt-name { font-weight: 600; }
+.modal-opt-hint { font-size: 10.5px; color: #8a7159; }
+
+/* small marker beside the name on cards that offer 2 download sources */
+.card-multi-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 3px;
+  border: 1px solid var(--border-hover, #3a4238);
+  background: transparent;
+  color: var(--signal, #5eff9e);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.modal-x {
+  all: unset;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #8a7159;
+  font-size: 16px;
+  line-height: 1;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.modal-x:hover {
+  color: #f9efe4;
+  background: rgba(255,255,255,0.06);
+}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="source-modal">
+  <div class="modal-box">
+    <button class="modal-x" id="modal-close-btn" type="button" aria-label="Close">✕</button>
+    <div class="modal-title" id="modal-item-name">Choose a source</div>
+    <div class="modal-sub">Pick where you'd like to get this from.</div>
+    <div class="modal-options">
+      <a class="modal-opt" id="modal-drive-link" target="_blank" rel="noopener noreferrer">
+        <div class="modal-opt-label">
+          <span class="modal-opt-name">Google Drive</span>
+          <span class="modal-opt-hint">Direct file, fastest</span>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="modal-opt" id="modal-official-link" target="_blank" rel="noopener noreferrer">
+        <div class="modal-opt-label">
+          <span class="modal-opt-name">Official Site</span>
+          <span class="modal-opt-hint">Sign-in required</span>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Software · Plugins · Extensions</div>
+  <h1 class="hero-title">BLITZ STACK</h1>
+  <div class="disclaimer-pill">
+    <span class="dot"></span>
+    Use them on ur OWN risk.
+  </div>
+</div>
+
+<div class="sticky-nav">
+  <div class="search-wrap">
+    <span class="search-icon"></span>
+    <input type="text" id="search" placeholder="search anything..." autocomplete="off" spellcheck="false">
+  </div>
+  <div class="filter-scroll" id="filters"></div>
+  <span class="count-badge" id="count"></span>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  <span>BLITZ STACK</span>
+  <span id="total-count"></span>
+</footer>
+
+<script>
+const data = [
+  {
+    category: "🖥️ Software",
+    items: [
+      { name: "DaVinci Resolve Studio 21", url: "https://www.mediafire.com/file/x60wnclpin7dzyl/DaVinci_Resolve_Studio_21_(Lofix).rar/file",              desc: "The color grading goat. Free version is already insane.", tag: "lofix" },
+      { name: "Adobe Photoshop 2025",      url: "https://www.mediafire.com/file_premium/41coy9wiqfjpxxw/Adobe_Photoshop_2025_%2528Lofix%2529.rar/file",    desc: "Photo editing GOAT. No further explanation needed.", tag: "lofix" },
+      { name: "Adobe Premiere Pro 2025",   url: "https://www.mediafire.com/file_premium/ficpvapzz8ivjqn/Adobe_Premiere_Pro_2025_%2528Lofix%2529.rar/file", desc: "Latest Premiere. Edit fast, render faster.", tag: "lofix" },
+      { name: "Adobe Premiere Pro 2023",   url: "https://www.mediafire.com/file_premium/b50el4cqzc9l367/Adobe_Premiere_Pro_2023_%2528Lofix%2529.rar/file", desc: "2023 build for legacy plugin compatibility.", tag: "lofix" },
+      { name: "Adobe After Effects 2025",  url: "https://www.mediafire.com/file_premium/vkaavzw9mjxsr9i/Adobe_After_Effects_2025_%2528Lofix%2529.rar/file", desc: "Motion graphics software. Make stuff move beautifully.", tag: "lofix" },
+      { name: "Adobe After Effects 2023",  url: "https://www.mediafire.com/file_premium/c7ufl2hes462e62/Adobe_After_Effects_2023_%2528Lofix%2529.rar/file", desc: "Stable 2023 AE build. Great for older plugins.", tag: "lofix" },
+      { name: "Topaz Video AI 3.1.10",     url: "https://www.mediafire.com/file/5qqr1jl31ip21wv/Topaz_Video_AI_3.1.10_%2528lofix%2529.zip/file",          desc: "AI upscaling for video. Makes old footage look new.", tag: "lofix" },
+    ]
+  },
+  {
+    category: "🔌 Plugins — Cracked ",
+    items: [
+      { name: "Sapphire 2024",      url: "https://www.mediafire.com/file_premium/9l5yviec9e3idt9/Sapphire_2024%2528lofix%2529.zip/file",        desc: "270+ VFX effects. The industry standard plugin suite.", tag: "lofix" },
+      { name: "BCC 2024",           url: "https://www.mediafire.com/file_premium/pwlsg32vylivd3z/BCC_2024.rar/file",                            desc: "Boris Continuum pack. 250+ filters for AE and Premiere.", tag: "lofix" },
+      { name: "RSMB Pro",           url: "https://www.mediafire.com/file_premium/r3fphp1camqu3f2/RSMB_Pro%2528lofix%2529.rar/file",             desc: "Realistic motion blur on any footage automatically.", tag: "lofix" },
+      { name: "Element 3D",         url: "https://drive.google.com/file/d/1urtUTCmdlngiz-tGjnrP9RQVc1nzyoKx/view",                             desc: "3D models inside After Effects. No Cinema 4D needed.", tag: "lofix" },
+      { name: "Saber v1.0.4",       url: "https://www.mediafire.com/file_premium/wfsmtl2ao209gbi/Saber_v1.0.4%2528lofix%2529.zip/file",         desc: "Energy beams and lightsaber FX by Video Copilot.", tag: "lofix" },
+      { name: "Deep Glow 2 v1.1.0 ", url: "https://drive.google.com/drive/folders/1dCMnvYPQf5rkiCGjlZIwEhpq2l9PTkv9?usp=sharing", officialUrl: "https://bzzhr.to/cluiylctua2t", desc: "Physically accurate glow. Way better than native AE.", tag: "keyflame" },
+      { name: "Flow v1.5.2",        url: "https://www.mediafire.com/file_premium/5jfcctapeav3cxj/Flow_v1.5.2_%2528Lofix%2529.zip/file",         desc: "Visual easing curve editor for buttery animations.", tag: "lofix" },
+      { name: "Twitch",             url: "https://www.mediafire.com/file_premium/zqfloqdtcss9zbv/Twitch_Plug-in.zip/file",                      desc: "Randomize anything in AE for glitch and chaos effects.", tag: "lofix" },
+    ]
+  },
+  {
+    category: "🆓 Plugins — Free",
+    items: [
+      { name: "FX Console v1.0.3", url: "https://www.videocopilot.net/blog/2018/05/fx-console-updated-to-v1-0-3/", desc: "Quick search for AE effects. Apply in seconds, no menus.", tag: "free" },
+      { name: "EaseCopy",          url: "https://aescripts.com/easecopy/",                                         desc: "Copy easing curves between keyframes in one click.", tag: "free" },
+      { name: "Bouncr",           url: "https://ukramedia.com/product/bouncr/",                                   desc: "OLD - Auto bounce and spring physics on any AE property.", tag: "free" },
+      { name: "Smart Bounce",           url: "https://drive.google.com/drive/folders/1O6kN-sGb6swVf0yY-4CSERZHM_8fEapg?usp=drive_link", officialUrl: "https://ukramedia.com/product/bouncr/",       desc: " NEW - Auto bounce and spring physics on any AE property.", tag: "free" },
+      { name: "Textifly",          url: "https://officialmotionsfly.gumroad.com/l/textifly", desc: "Text animation preset pack. Slap it on and ship.", tag: "free" },
+      { name: "motionfun",          url: "https://motionfun.net/",                       desc: "Few free plugins like custom palletes in Ae kinda cool ngl VERY usefull too ", tag: "free" },
+      { name: "split-text",          url: "https://drive.google.com/drive/folders/1T78RJcVW4_DVeEN7XOuDo6SffwjNLtVD?usp=sharing", officialUrl: "https://www.jakeinmotion.com/split-text",         desc: "Split txt into differnet units and use master controller null", tag: "free" }
+
+    ]
+  },
+
+   {
+    category: "🆓 My Own  ",
+    items: [
+      { name: "Baku Texts", url: "https://drive.google.com/drive/folders/1SYkYJj2hQjTysgbVyrxG5T3B0fMI3D_D?usp=sharing", desc: "Animate text in After Effects with ease via adjustable presets. Just run the JSX file.", tag: "MINE" },
+      { name: "BakuraiBlitz MasterKit", url: "https://drive.google.com/drive/folders/1a1PTQRBL-Moy9ccGHzoFcAPSOqtKKUgP?usp=drive_link", desc: "A toolkit for AE packed with features. It's a CEP extension. ", tag: "MINE" },
+      { name: "Baku Graphs", url: "https://drive.google.com/drive/folders/1nrW0QMJ5ANNKCke0ltddqVgqSKGpD23x?usp=drive_link", desc: "Visualize the famous bouncr.jsxbin script and tweak the parameters to get the desired bounce.", tag: "MINE" },
+      { name: "Glass UI", url: "https://drive.google.com/drive/folders/1AGvK49x71CbPfBJIFx36QgiooZVq2z3z", desc: "Run the script, select the target layer, click Create, and boom — glass UI for that shape layer. No separate linked properties yet.", tag: "MINE" }
+   ]
+  },
+];
+
+let allCards = [];
+
+/* ---- reusable "choose a source" modal ---- */
+// Call with any item that has { url, officialUrl, name }.
+// Only items you explicitly give an `officialUrl` field trigger this —
+// everything else keeps working as a plain direct link.
+function openSourceModal(item) {
+  document.getElementById('modal-item-name').textContent = item.name;
+
+  const driveLink = document.getElementById('modal-drive-link');
+  driveLink.href = item.url;
+
+  const officialLink = document.getElementById('modal-official-link');
+  officialLink.href = item.officialUrl;
+
+  document.getElementById('source-modal').classList.add('open');
+}
+
+function closeSourceModal() {
+  document.getElementById('source-modal').classList.remove('open');
+}
+
+document.getElementById('modal-close-btn').addEventListener('click', closeSourceModal);
+document.getElementById('source-modal').addEventListener('click', e => {
+  if (e.target.id === 'source-modal') closeSourceModal(); // click outside the box
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSourceModal();
+});
+// close modal once a choice is clicked (link still opens in new tab as normal)
+document.getElementById('modal-drive-link').addEventListener('click', closeSourceModal);
+document.getElementById('modal-official-link').addEventListener('click', closeSourceModal);
+
+function buildUI() {
+  const main = document.getElementById('main');
+  const filtersDiv = document.getElementById('filters');
+  let total = 0;
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-btn active';
+  allBtn.textContent = 'All';
+  allBtn.dataset.filter = 'all';
+  filtersDiv.appendChild(allBtn);
+
+  data.forEach(section => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.textContent = section.category;
+    btn.dataset.filter = section.category;
+    filtersDiv.appendChild(btn);
+
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.dataset.category = section.category;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML = `
+      <span class="section-label">${section.category}</span>
+      <span class="section-count">${section.items.length} items</span>`;
+    sec.appendChild(hdr);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    section.items.forEach(item => {
+      // items with officialUrl get a "choose a source" popup instead of a direct link.
+      // Card stays an <a> either way so it inherits theme.css's `a.card` styling exactly —
+      // for choice items we just prevent the default navigation and open the modal instead.
+      const needsChoice = !!item.officialUrl;
+
+      const card = document.createElement('a');
+      card.className = 'card';
+      card.href = item.url;
+
+      if (needsChoice) {
+        card.addEventListener('click', e => {
+          e.preventDefault();
+          openSourceModal(item);
+        });
+      } else {
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
+
+      card.dataset.name = item.name.toLowerCase();
+      card.dataset.desc = item.desc.toLowerCase();
+      card.dataset.category = section.category;
+
+      const tagHtml = item.tag === 'lofix'
+        ? '<span class="card-tag tag-lofix">LOFIX</span>'
+        : item.tag === 'MINE'
+        ? '<span class="card-tag tag-mine">MINE</span>'
+        : item.tag === 'keyflame'
+        ? '<span class="card-tag tag-keyflame">KEYFLAME</span>'
+        : '<span class="card-tag tag-free">FREE</span>';
+
+      const badgeHtml = needsChoice ? '<span class="card-multi-badge">2</span>' : '';
+
+      card.innerHTML = `
+        <div class="card-row">
+          <div class="card-name">${item.name}${badgeHtml}</div>
+          <span class="arrow">↗</span>
+        </div>
+        <div class="card-desc">${item.desc}</div>
+        ${tagHtml}
+      `;
+
+      grid.appendChild(card);
+      allCards.push(card);
+      total++;
+    });
+
+    sec.appendChild(grid);
+    main.appendChild(sec);
+  });
+
+  document.getElementById('total-count').textContent = total + ' items';
+  updateCount();
+}
+
+function updateCount() {
+  const v = allCards.filter(c => !c.classList.contains('hidden')).length;
+  document.getElementById('count').textContent = v + ' items';
+}
+
+function filterByCategory(cat) {
+  document.querySelectorAll('.filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.filter === cat));
+  document.querySelectorAll('.section').forEach(s =>
+    s.classList.toggle('hidden', cat !== 'all' && s.dataset.category !== cat));
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  if (q) doSearch(q);
+  else {
+    allCards.forEach(c =>
+      c.classList.toggle('hidden', c.closest('.section').classList.contains('hidden')));
+    updateCount();
+  }
+}
+
+function matchesQuery(name, q) {
+  return name.includes(q);
+}
+
+function doSearch(q) {
+  const activeBtn = document.querySelector('.filter-btn.active');
+  const catOn = activeBtn ? activeBtn.dataset.filter : 'all';
+  document.querySelectorAll('.section').forEach(sec => {
+    const catHidden = catOn !== 'all' && sec.dataset.category !== catOn;
+    let anyMatch = false;
+    sec.querySelectorAll('.card').forEach(card => {
+      const match = !catHidden && matchesQuery(card.dataset.name, q);
+      card.classList.toggle('hidden', !match);
+      if (match) anyMatch = true;
+    });
+    sec.classList.toggle('hidden', catHidden || !anyMatch);
+  });
+  updateCount();
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) {
+    allCards.forEach(c =>
+      c.classList.toggle('hidden', c.closest('.section').classList.contains('hidden')));
+    updateCount();
+    return;
+  }
+  doSearch(q);
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (btn) filterByCategory(btn.dataset.filter);
+});
+
+buildUI();
+</script>
+</body>
+</html>

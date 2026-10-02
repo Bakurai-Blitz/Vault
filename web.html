@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE VAULT — Internet Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="theme.css" rel="stylesheet">
+<style>
+:root {
+  /* THE VAULT — ember shifted toward gold/teal-blue */
+  --accent: #ffa552;
+  --accent-bright: #ffc281;
+  --accent2: #5ca6db;
+  --accent2-bright: #8ac3ec;
+  --glow-rgb: 255, 165, 82;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo-word">THE VAULT</div>
+    <div class="logo-sub">Internet toolkit — all links</div>
+  </div>
+  <div class="header-meta">Updated 2026</div>
+</header>
+
+<div class="search-wrap">
+  <span class="search-icon"></span>
+  <input type="text" id="search" placeholder="search tools..." autocomplete="off" spellcheck="false">
+  <span class="pill-count" id="count"></span>
+</div>
+
+<div class="filter-bar" id="filters"></div>
+
+<main id="main"></main>
+
+<footer>
+  <span>THE VAULT — YOUR INTERNET TOOLKIT</span>
+  <span id="total-count">— tools</span>
+</footer>
+
+<script>
+const data = [
+  {
+    category: "🎨 Design",
+    items: [
+      { name: "DesignExtract", url: "https://www.design-extractor.com/", desc: "Extract .md file from any website via URL." },
+      { name: "Photopea", url: "https://photopea.com", desc: "Full Photoshop clone in the browser. Layers, masks, PSD support — free forever." },
+      { name: "Coolors", url: "https://coolors.co", desc: "Spacebar color palette generator. Millions of matching hex schemes instantly." },
+      { name: "Realtimecolors", url: "https://realtimecolors.com", desc: "Test color palettes on a live mock website. See text, bg, and buttons together." },
+      { name: "Fontjoy", url: "https://fontjoy.com", desc: "Font pairing tool. Shows combos and lets you download." },
+      { name: "Undraw", url: "https://undraw.co", desc: "Open-source SVG illustrations, recolorable to any hex." },
+      { name: "Mockupworld", url: "https://mockupworld.com", desc: "Free Photoshop mockups for every format." },
+      { name: "Shots.so", url: "https://shots.so", desc: "Drop screenshots into modern device mockup frames." },
+      { name: "Smartmockups", url: "https://smartmockups.com", desc: "Auto-place images into product mockups: mugs, shirts, screens." },
+      { name: "Flaticon", url: "https://flaticon.com", desc: "Millions of free vector icons across every style." },
+      { name: "SVGRepo", url: "https://svgrepo.com", desc: "No-BS vector library. Search, copy, done." },
+      { name: "SVGL", url: "https://svgl.app", desc: "SVG logos of popular brands. Clean, official." },
+      { name: "Haikei", url: "https://haikei.app", desc: "Generate SVG blobs, waves, and gradient backgrounds.", tag: "new" },
+      { name: "BGJar", url: "https://bgjar.com", desc: "Free SVG background pattern/shape generators." },
+      { name: "Spline", url: "https://spline.design", desc: "3D design in the browser, export directly to web.", tag: "fire" },
+      { name: "Reshot", url: "https://www.reshot.com", desc: "Free SVG icons and illustrations, no attribution needed." },
+      { name: "Logoipsum", url: "https://logoipsum.com", desc: "Placeholder logos for mockups and wireframes." },
+      { name: "Carbon", url: "https://carbon.now.sh", desc: "Turn code into beautiful, shareable images." },
+      { name: "Ray.so", url: "https://ray.so", desc: "Minimalist code screenshot tool." },
+      { name: "Spectacle", url: "https://spectacle.is", desc: "Design inspiration and resource hub." },
+      { name: "Cosmos", url: "https://www.cosmos.so/explore/graphic-design", desc: "Curated graphic design inspiration boards." },
+      { name: "Dribbble", url: "https://dribbble.com", desc: "Designer portfolio showcase and inspiration." },
+      { name: "Brik.space", url: "https://brik.space", desc: "Design resource collection." },
+      { name: "Spacetypegenerator", url: "https://spacetypegenerator.com", desc: "Peak text motion graphics generator." },
+      { name: "Genery", url: "https://genery.io", desc: "Motion graphic creation tools." },
+      { name: "Swishy", url: "https://www.swishy.ai", desc: "AI-powered animation generator." },
+      { name: "Toolfolio", url: "https://toolfolio.io", desc: "Curated design tool collection." },
+      { name: "Delphi Tools", url: "https://delphi.tools", desc: "Design and prototyping utilities." },
+      { name: "Excalidraw", url: "https://excalidraw.com", desc: "Browser whiteboard for diagrams. Hand-drawn aesthetic, exports clean SVG.", tag: "fire" },
+      { name: "tldraw", url: "https://tldraw.com", desc: "Quick mockup whiteboard. Simpler than Excalidraw, instant share link." },
+    ]
+  },
+  {
+    category: "🤖 AI Tools",
+    items: [
+      { name: "NotebookLM", url: "https://notebooklm.google.com", desc: "Feed it your PDFs/docs, it becomes an expert on them. Underrated.", tag: "fire" },
+      { name: "ElevenLabs", url: "https://elevenlabs.io", desc: "Best AI voice gen. Free tier = ~10min audio/month." },
+      { name: "Hugging Face Spaces", url: "https://huggingface.co/spaces", desc: "Free access to thousands of open-source AI models. No setup needed.", tag: "free" },
+      { name: "Perplexity", url: "https://perplexity.ai", desc: "AI search with citations. Great for research rabbit holes." },
+      { name: "Ideogram", url: "https://ideogram.ai", desc: "Best free AI image gen for text-in-images specifically.", tag: "fire" },
+      { name: "Kling AI", url: "https://kling.ai", desc: "Best free AI video generator. 66 daily credits, refreshes every 24h.", tag: "new" },
+      { name: "Perchance Image Gen", url: "https://perchance.org/image-generator-professional", desc: "Unlimited free AI image generation." },
+      { name: "Seed Dream 4.5", url: "https://seed.bytedance.com/en/seedream4_5", desc: "ByteDance's latest image gen model." },
+      { name: "Arena.ai", url: "https://arena.ai", desc: "AI model battle arena + free models without limits.", tag: "fire" },
+      { name: "Youmind GPT Prompts", url: "https://youmind.com/gpt-image-2-prompts", desc: "Curated GPT image prompts that actually work." },
+      { name: "CVoice", url: "https://cvoice.ai/ai-voice", desc: "Unlimited free AI voice generation." },
+      { name: "Framenet", url: "http://framenet.ai", desc: "AI-powered content creation tool." },
+      { name: "Kimi", url: "https://kimi.com", desc: "Clone website designs and AI assistant." },
+      { name: "LALAL.AI", url: "https://lalal.ai", desc: "AI vocal/stem separator. Rip instrumentals or isolate vocals.", tag: "fire" },
+    ]
+  },
+  {
+    category: "🔧 Developer Tools",
+    items: [
+      { name: "Regex101", url: "https://regex101.com", desc: "Live regex tester with step-by-step explanations. Essential.", tag: "fire" },
+      { name: "Transform.tools", url: "https://transform.tools", desc: "Convert JSON↔TypeScript, HTML↔JSX, and between dozens of formats." },
+      { name: "Bundlephobia", url: "https://bundlephobia.com", desc: "Check npm package size before you add it to your project." },
+      { name: "CodeBeautify", url: "https://codebeautify.org", desc: "Format/validate JSON, XML, SQL, and everything else." },
+      { name: "Crontab.guru", url: "https://crontab.guru", desc: "Plain English cron schedule builder. Never Google cron syntax again." },
+      { name: "ExplainShell", url: "https://explainshell.com", desc: "Paste any bash command, it explains every flag and argument." },
+      { name: "JSONCrack", url: "https://jsoncrack.com", desc: "Visualize JSON as an interactive graph. Beautiful.", tag: "new" },
+      { name: "TableConvert", url: "https://tableconvert.com", desc: "Convert between Markdown tables, CSV, JSON, HTML, Excel." },
+      { name: "GitHub System Prompts", url: "https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools", desc: "Leaked system prompts for major AI tools." },
+      { name: "SpotX", url: "https://github.com/orgs/SpotX-Official/repositories", desc: "Spotify enhancement scripts." },
+      { name: "IDM Activation", url: "https://github.com/lstprjct/IDM-Activation-Script", desc: "IDM activation script." },
+      { name: "Stirling PDF", url: "https://github.com/Stirling-Tools/Stirling-PDF", desc: "Self-hosted PDF toolkit. Merge, split, compress locally.", tag: "free" },
+      { name: "Massgrave", url: "https://massgrave.dev", desc: "Windows/Office activation scripts." },
+      { name: "LightPDF", url: "https://lightpdf.com/edit-pdf", desc: "Edit PDFs seamlessly in the browser." },
+    ]
+  },
+  {
+    category: "📚 Books & Learning",
+    items: [
+      { name: "Libgen", url: "https://libgen.is", desc: "Shadow library. Millions of textbooks and academic books, free." },
+      { name: "Sci-Hub", url: "https://sci-hub.se", desc: "Millions of research papers and scientific articles, free." },
+      { name: "Z-Library", url: "https://z-lib.gs", desc: "More searchable Libgen cousin. Books + articles.", tag: "fire" },
+      { name: "Welib", url: "https://welib.st", desc: "Book discovery and download." },
+      { name: "Gutenberg", url: "https://gutenberg.org", desc: "70,000+ free public domain eBooks. The classics, all legal." },
+      { name: "OpenCulture", url: "https://openculture.com", desc: "Free online courses, audiobooks, films from top universities." },
+      { name: "Snaplearn", url: "https://snaplearn.tech", desc: "Notes and study guides for quick learning." },
+      { name: "Khan Academy", url: "https://khanacademy.org", desc: "Still the GOAT for structured free learning. Every subject.", tag: "free" },
+      { name: "ResearchRabbit", url: "https://researchrabbit.ai", desc: "Maps citation networks. Find related papers faster than any search.", tag: "new" },
+      { name: "Elicit", url: "https://elicit.com", desc: "AI literature review. Extracts key data from papers automatically." },
+      { name: "Sobrief", url: "https://sobrief.com", desc: "10-minute book summaries." },
+    ]
+  },
+  {
+    category: "🎬 Video & Media",
+    items: [
+      { name: "Cobalt.tools", url: "https://cobalt.tools", desc: "yt-dlp as a website. Download from YouTube, TikTok, etc.", tag: "fire" },
+      { name: "Descript", url: "https://descript.com", desc: "Edit video by editing its transcript. Different paradigm entirely." },
+      { name: "CapCut", url: "https://capcut.com", desc: "Auto-captions, beat-sync, background removal. Free tier is insane." },
+      { name: "Unscreen", url: "https://unscreen.com", desc: "Remove background from videos/GIFs. No green screen needed." },
+      { name: "Cineby", url: "https://cineby.sc", desc: "Watch movies and shows free." },
+      { name: "1Shows", url: "https://1shows.nl", desc: "Free streaming site." },
+      { name: "Anikoto", url: "https://anikototv.to", desc: " Hi anime's Successor" },
+      { name: "Anikoto", url: "https://miruro.com", desc: "Free Anime " },
+      { name: "SteamRip", url: "https://steamrip.com", desc: "Free PC game downloads." },
+      { name: "RomsFun", url: "https://romsfun.com", desc: "ROM downloads for emulation." },
+      { name: "OldGames", url: "https://oldgamesdownload.com", desc: "Classic PC games, free." },
+      { name: "GlobeTV", url: "https://globetv.app", desc: "Watch live TV from any country. News, sports, entertainment globally." },
+      { name: "Streamex", url: "https://www.streamex.net", desc: "Free streaming content." },
+      { name: "Playphrase", url: "https://www.playphrase.me", desc: "Find specific words/phrases as they appear in cinema." },
+      { name: "SignalRGB", url: "https://signalrgb.com/download-thanks/", desc: "RGB lighting control software." },
+    ]
+  },
+  {
+    category: "🔊 Audio & Music",
+    items: [
+      { name: "LALAL.AI", url: "https://lalal.ai", desc: "AI stem separator. Isolate vocals or instrumentals from any track.", tag: "fire" },
+      { name: "Mubert", url: "https://mubert.com", desc: "AI-generated royalty-free music for videos and streams." },
+      { name: "Freesound", url: "https://freesound.org", desc: "Community library of free CC-licensed sound effects. Massive.", tag: "free" },
+      { name: "BBC SFX", url: "https://sound-effects.bbcrewind.co.uk", desc: "BBC's official free sound effects archive." },
+      { name: "MyInstants", url: "https://www.myinstants.com", desc: "Meme sound effects instant board." },
+      { name: "CGHeaven", url: "https://cgheven.com", desc: "Creative assets collection." },
+      { name: "Audacity", url: "https://audacityteam.org", desc: "The OG free desktop audio editor. Still unbeaten for power." },
+    ]
+  },
+  {
+    category: "🖼️ Image Tools",
+    items: [
+      { name: "Remove.bg", url: "https://remove.bg", desc: "AI background removal from images. Instant and free." },
+      { name: "Cleanup.pictures", url: "https://cleanup.pictures", desc: "AI object removal from photos in seconds." },
+      { name: "Squoosh", url: "https://squoosh.app", desc: "Google's image compressor. Privacy-friendly, powerful." },
+      { name: "Clipping Magic", url: "https://clippingmagic.com", desc: "Fine-tuned background removal with edge control." },
+      { name: "Photext", url: "https://photext.shop", desc: "Edit text in any image." },
+      { name: "Text Behind Image", url: "https://textbehindimage.com", desc: "Place text behind subjects in images easily." },
+      { name: "Terraink", url: "https://terraink.app", desc: "Turn city maps into cool art." },
+      { name: "Polyhaven Textures", url: "https://polyhaven.com/textures", desc: "Free, high-quality PBR textures for 3D/design work." },
+    ]
+  },
+  {
+    category: "🔒 Privacy & Security",
+    items: [
+      { name: "HaveIBeenPwned", url: "https://haveibeenpwned.com", desc: "Check if your email or passwords were in a data breach." },
+      { name: "SimpleLogin", url: "https://simplelogin.io", desc: "Email alias service. Give sites fake addresses that forward to you.", tag: "fire" },
+      { name: "Proton", url: "https://proton.me", desc: "Encrypted email + VPN + drive. Free tier solid." },
+      { name: "Bitwarden", url: "https://bitwarden.com", desc: "Open-source password manager. Fully free and audited.", tag: "free" },
+      { name: "BrowserLeaks", url: "https://browserleaks.com", desc: "See exactly what your browser leaks: fingerprint, IP, WebRTC." },
+      { name: "Privnote", url: "https://privnote.com", desc: "Self-destructing secret notes. Share, then it's gone." },
+      { name: "10minutemail", url: "https://10minutemail.com", desc: "Temporary self-destructing email. Dodge sketchy signups." },
+      { name: "OnlineSIM", url: "https://onlinesim.io", desc: "Virtual SIM for SMS verification without your real number." },
+    ]
+  },
+  {
+    category: "🌐 Web Utilities",
+    items: [
+      { name: "Wayback Machine", url: "https://archive.org", desc: "Historical snapshots of the entire web. Billions of pages archived." },
+      { name: "Archive.is", url: "https://archive.is", desc: "Community-archived article snapshots. Bypass live paywalls." },
+      { name: "AlternativeTo", url: "https://alternativeto.net", desc: "Find free or open-source alternatives to any software." },
+      { name: "JustWatch", url: "https://justwatch.com", desc: "Find which streaming platform has the movie/show you want." },
+      { name: "WolframAlpha", url: "https://wolframalpha.com", desc: "Computational intelligence engine. Solves complex math step-by-step." },
+      { name: "12ft.io", url: "https://12ft.io", desc: "Paywall bypass. Note: may be limited/offline." },
+      { name: "RemovePaywalls", url: "https://removepaywalls.com", desc: "Searches web caches to find readable copies of blocked articles." },
+      { name: "Ladder (GitHub)", url: "https://github.com/everywall/ladder", desc: "Self-hosted, open-source paywall bypasser. Can never be taken down." },
+      { name: "ToffeeShare", url: "https://toffeeshare.com", desc: "P2P file sharing any size, E2E encrypted, no cloud storage." },
+      { name: "TinyWow", url: "https://tinywow.com", desc: "Swiss-army knife: convert files, trim video, extract audio, edit images." },
+      { name: "Disk Analyzer", url: "https://diskanalyzer.com/download", desc: "Analyze what's eating your disk space." },
+      { name: "FakeUpdate", url: "https://fakeupdate.net", desc: "Fake Windows update screens. Fool people for a quick break." },
+      { name: "NextDNS Emergency", url: "https://42beca.dns.nextdns.io", desc: "Your emergency NextDNS config endpoint." },
+      { name: "NextDNS Normal", url: "https://c6fe4c.dns.nextdns.io", desc: "Your normal NextDNS config endpoint." },
+    ]
+  },
+  {
+    category: "📦 Free Software",
+    items: [
+      { name: "FMHY", url: "https://fmhy.net", desc: "The ultimate index of free software, media, and tools. Massive wiki." , tag: "fire" },
+      { name: "Adescargar", url: "https://adescargar.net", desc: "Free Android APK downloads." },
+      { name: "94FBR Search", url: "https://www.google.com/search?q=94fbr", desc: "Append '94fbr' to any app name to find leaked license keys." },
+      { name: "AORUS B860M Support", url: "https://www.aorus.com/motherboards/b860m-k/Support", desc: "Your motherboard driver/support page." },
+    ]
+  },
+  {
+    category: "📸 Inspiration & Discovery",
+    items: [
+      { name: "Shots.so", url: "https://shots.so", desc: "Screenshot mockup frames. Clean, modern device canvases." },
+      { name: "Unsplash-style", url: "https://fmhy.net", desc: "See FMHY for curated free image sources." },
+      { name: "Musclewiki", url: "https://musclewiki.com", desc: "Click a muscle, get exercises. Simple and actually useful." },
+      { name: "Terraink", url: "https://terraink.app", desc: "City maps turned into beautiful art prints." },
+      { name: "Coolors", url: "https://coolors.co", desc: "Color palette generator. Spacebar for new palettes." },
+    ]
+  },
+];
+
+let allCards = [];
+
+function buildUI() {
+  const main = document.getElementById('main');
+  const filtersDiv = document.getElementById('filters');
+  let totalCount = 0;
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'fbtn active';
+  allBtn.textContent = 'ALL';
+  allBtn.dataset.filter = 'all';
+  filtersDiv.appendChild(allBtn);
+
+  data.forEach(section => {
+    const btn = document.createElement('button');
+    btn.className = 'fbtn';
+    btn.textContent = section.category;
+    btn.dataset.filter = section.category;
+    filtersDiv.appendChild(btn);
+
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.dataset.category = section.category;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML = `<span class="section-title">${section.category}</span><span class="section-count">${section.items.length} tools</span>`;
+    sec.appendChild(hdr);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    section.items.forEach(item => {
+      const card = document.createElement('a');
+      card.className = 'card';
+      card.href = item.url.startsWith('http') ? item.url : 'https://' + item.url;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      card.dataset.name = item.name.toLowerCase();
+      card.dataset.desc = item.desc.toLowerCase();
+      card.dataset.category = section.category;
+
+      card.innerHTML = `
+        <div class="card-name">${item.name} <span class="arrow">→</span></div>
+        <div class="card-desc">${item.desc}</div>
+      `;
+
+      grid.appendChild(card);
+      allCards.push(card);
+      totalCount++;
+    });
+
+    sec.appendChild(grid);
+    main.appendChild(sec);
+  });
+
+  document.getElementById('total-count').textContent = `${totalCount} tools`;
+  updateCount();
+}
+
+function updateCount() {
+  const visible = allCards.filter(c => !c.classList.contains('hidden')).length;
+  document.getElementById('count').textContent = visible + ' tools';
+}
+
+function filterByCategory(cat) {
+  document.querySelectorAll('.fbtn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === cat);
+  });
+
+  document.querySelectorAll('.section').forEach(sec => {
+    if (cat === 'all' || sec.dataset.category === cat) {
+      sec.classList.remove('hidden');
+    } else {
+      sec.classList.add('hidden');
+    }
+  });
+
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  if (q) doSearch(q);
+  else {
+    allCards.forEach(c => {
+      const secHidden = c.closest('.section').classList.contains('hidden');
+      c.classList.toggle('hidden', secHidden);
+    });
+    updateCount();
+  }
+}
+
+function matchesQuery(name, q) {
+  return name.includes(q);
+}
+
+function doSearch(q) {
+  const activeBtn = document.querySelector('.fbtn.active');
+  const catOn = activeBtn ? activeBtn.dataset.filter : 'all';
+  document.querySelectorAll('.section').forEach(sec => {
+    const catHidden = catOn !== 'all' && sec.dataset.category !== catOn;
+    let anyMatch = false;
+    sec.querySelectorAll('.card').forEach(card => {
+      const match = !catHidden && matchesQuery(card.dataset.name, q);
+      card.classList.toggle('hidden', !match);
+      if (match) anyMatch = true;
+    });
+    sec.classList.toggle('hidden', catHidden || !anyMatch);
+  });
+  updateCount();
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) {
+    allCards.forEach(card => {
+      const secHidden = card.closest('.section').classList.contains('hidden');
+      card.classList.toggle('hidden', secHidden);
+    });
+    updateCount();
+    return;
+  }
+  doSearch(q);
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.fbtn');
+  if (!btn) return;
+  filterByCategory(btn.dataset.filter);
+});
+
+buildUI();
+</script>
+</body>
+</html>

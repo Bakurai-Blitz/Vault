@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DROID — Android Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="theme.css" rel="stylesheet">
+<style>
+:root {
+  /* DROID — base ember */
+  --accent: #ff7a3d;
+  --accent-bright: #ffa563;
+  --accent2: #ffb347;
+  --accent2-bright: #ffd08a;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo-word">DROID</div>
+    <div class="logo-sub">Android toolkit — all apps</div>
+  </div>
+  <div class="header-meta">
+    <div id="hdr-count">— apps</div>
+    <div>Updated 2026</div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <span class="search-icon"></span>
+  <input type="text" id="srch" placeholder="search apps..." autocomplete="off" spellcheck="false">
+  <span class="pill-count" id="cnt"></span>
+</div>
+
+<div class="filter-bar" id="filters"></div>
+
+<main id="main"></main>
+
+<footer>
+  <span>DROID — ANDROID TOOLKIT</span>
+  <span id="ft-count"></span>
+</footer>
+
+<script>
+const DATA = [
+  {
+    cat: "🎵 Music",
+    items: [
+      { name:"OuterTune",    icon:"🎵", url:"https://github.com/OuterTune/OuterTune/releases",          desc:"YouTube Music client with offline, lyrics, Material You.", badge:"foss" },
+      { name:"EchoNightly",  icon:"🎵", url:"https://github.com/itsmechinmoy/echo-nightly/releases",   desc:"Nightly builds of Echo music player. Cutting edge features.", badge:"new" },
+      { name:"Velune",       icon:"🎵", url:"https://github.com/nikhilvishwakarma00/Velune",            desc:"Minimal local music player, clean UI.", badge:"foss" },
+      { name:"RiPlay",       icon:"🎵", url:"https://github.com/fast4x/RiPlay/releases/",              desc:"YouTube Music mod with extra features.", badge:"foss" },
+      { name:"ViMusic",      icon:"🎵", url:"https://github.com/vfsfitvnm/ViMusic/releases",            desc:"Stream any song from YouTube Music for free, no account.", badge:"must" },
+    ]
+  },
+  {
+    cat: "📺 Video & Streaming",
+    items: [
+      { name:"LibreTube",    icon:"📺", url:"https://github.com/libre-tube/LibreTube/releases",         desc:"YouTube frontend via Piped. No Google tracking, SponsorBlock built-in.", badge:"foss" },
+      { name:"NewPipe",      icon:"📺", url:"https://github.com/TeamNewPipe/NewPipe/releases",           desc:"Lightweight YouTube client. No ads, background play, download.", badge:"must" },
+      { name:"Anilab",       icon:"📺", url:"https://github.com/msrofficial/Anilab-Mod/releases",        desc:"Mod anime streaming app. Full library, no ads.", badge:"new" },
+      { name:"OnStream",     icon:"📺", url:"https://onstream.so/",                                      desc:"Free movie and TV streaming." },
+      { name:"S Player",     icon:"📺", url:"https://play.google.com/store/apps/details?id=com.ttee.leeplayer", desc:"Smooth, clean video player. Subtitle support." },
+      { name:"VLC",          icon:"📺", url:"https://f-droid.org/packages/org.videolan.vlc/",          desc:"Plays literally anything. The OG open source media player.", badge:"must" },
+    ]
+  },
+  {
+    cat: "⬇️ Downloaders",
+    items: [
+      { name:"YTDLnis",      icon:"⬇️", url:"https://github.com/deniscerri/ytdlnis/releases",            desc:"GUI for yt-dlp. Download from 1000+ sites, format picker.", badge:"must" },
+      { name:"Seal",         icon:"⬇️", url:"https://github.com/JunkFood02/Seal/releases",               desc:"Clean yt-dlp GUI. Material You, simple and fast.", badge:"foss" },
+      { name:"1DM",          icon:"⬇️", url:"https://play.google.com/store/apps/details?id=idm.internet.download.manager", desc:"Multi-thread download manager. IDM for Android." },
+      { name:"Aria2App",     icon:"⬇️", url:"https://github.com/devgianlu/Aria2App/releases",            desc:"Aria2 download manager frontend. Torrents, HTTP, magnets.", badge:"foss" },
+    ]
+  },
+  {
+    cat: "🛠️ System & Root",
+    items: [
+      { name:"Shizuku",      icon:"🛠️", url:"https://github.com/rikkaapps/shizuku/releases/",            desc:"Run apps with elevated ADB permissions. Gateway to power tools.", badge:"must" },
+      { name:"ShizuTools",   icon:"🛠️", url:"https://github.com/legendsayantan/ShizuTools/releases/",    desc:"System tweaks powered by Shizuku. Debloat, permissions, more.", badge:"new" },
+      { name:"Geto",         icon:"🛠️", url:"https://github.com/JackEblan/Geto/releases",                desc:"Per-app settings automation via Shizuku.", badge:"foss" },
+      { name:"Canta",        icon:"🛠️", url:"https://github.com/samolego/Canta/releases",                desc:"Uninstall ANY system app without root, uses Shizuku.", badge:"must" },
+      { name:"aShell You",   icon:"🛠️", url:"https://github.com/DP-Hridayan/aShellYou/releases",         desc:"ADB shell GUI on-device via Shizuku. Run commands without PC.", badge:"foss" },
+      { name:"Termux",       icon:"🛠️", url:"https://github.com/termux/termux-app/releases",             desc:"Full Linux terminal on Android. Install packages, run scripts.", badge:"must" },
+      { name:"SD Maid SE",   icon:"🛠️", url:"https://github.com/d4rken-org/sdmaid-se/releases",          desc:"Deep storage cleaner. Finds junk other cleaners miss.", badge:"foss" },
+      { name:"Scrcpy",       icon:"🛠️", url:"https://github.com/Genymobile/scrcpy/releases",             desc:"Mirror & control your Android from PC via USB/WiFi. 60fps.", badge:"must" },
+    ]
+  },
+  {
+    cat: "📦 App Management",
+    items: [
+      { name:"Obtainium",    icon:"📦", url:"https://github.com/ImranR98/Obtainium/releases",            desc:"Auto-update APKs directly from GitHub/F-Droid/anywhere.", badge:"must" },
+      { name:"UpdateMe",     icon:"📦", url:"https://github.com/anfreire/updateMe-Mobile/releases",      desc:"Curated modded app updates in one place.", badge:"new" },
+      { name:"ReVanced",     icon:"📦", url:"https://github.com/revanced/revanced-manager/releases",     desc:"Patch YouTube, Reddit, Twitter and more. No root needed.", badge:"must" },
+      { name:"Morphe",     icon:"📦", url:"https://github.com/morpheapp",     desc:"Patch YouTube, YT music, Reddit", badge:"new" },
+      { name:"ReVanced Ext", icon:"📦", url:"https://github.com/inotia00/revanced-manager/releases",     desc:"ReVanced with extra patches from inotia00.", badge:"new" },
+      { name:"MicroG",       icon:"📦", url:"https://github.com/revanced/gmscore/releases",              desc:"Open-source Google Play Services replacement for ReVanced.", badge:"foss" },
+      { name:"Aurora Store",  icon:"📦", url:"https://auroraoss.com/files/",                             desc:"Play Store client. Download APKs anonymously, no Google account.", badge:"must" },
+      { name:"F-Droid",      icon:"📦", url:"https://f-droid.org/",                                      desc:"The FOSS app store. Only open source apps, no ads ever.", badge:"foss" },
+      { name:"Droid-ify",    icon:"📦", url:"https://github.com/Droid-ify/client/releases",              desc:"Better F-Droid client. Material You, faster, cleaner UI.", badge:"new" },
+    ]
+  },
+  {
+    cat: "📁 Files & Storage",
+    items: [
+      { name:"MiXplorer",    icon:"📁", url:"https://mixplorer.com",                                     desc:"The best Android file manager. Dual pane, themes, FTP, cloud.", badge:"must" },
+      { name:"ZArchiver",    icon:"📁", url:"https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver", desc:"Extract and create archives. Supports everything." },
+      { name:"LocalSend",    icon:"📁", url:"https://github.com/localsend/localsend/releases",           desc:"AirDrop for all platforms. Fast, encrypted, no internet needed.", badge:"must" },
+      { name:"PaperKnife",   icon:"📁", url:"https://github.com/potatameister/PaperKnife/releases",      desc:"Swiss-army knife file utility tool.", badge:"new" },
+    ]
+  },
+  {
+    cat: "🔒 Privacy & Security",
+    items: [
+      { name:"Proton VPN",   icon:"🔒", url:"https://protonvpn.com/download",                            desc:"No-logs VPN, unlimited free tier. Swiss privacy.", badge:"must" },
+      { name:"Orbot",        icon:"🔒", url:"https://github.com/guardianproject/orbot/releases",         desc:"Route all apps through Tor. Maximum anonymity.", badge:"foss" },
+      { name:"Signal",       icon:"🔒", url:"https://signal.org/android/apk/",                           desc:"End-to-end encrypted messaging. The gold standard.", badge:"must" },
+      { name:"KeePassDX",    icon:"🔒", url:"https://github.com/Kunzisoft/KeePassDX/releases",           desc:"Offline password manager. Biometric auth, autofill, 2FA.", badge:"foss" },
+      { name:"Malwarebytes", icon:"🔒", url:"https://play.google.com/store/apps/details?id=org.malwarebytes.antimalware", desc:"Malware scanner for sketchy APKs." },
+      { name:"VirusTotal",   icon:"🔒", url:"https://www.virustotal.com",                                desc:"Scan files and URLs against 70+ antivirus engines." },
+      { name:"Cryptomator",  icon:"🔒", url:"https://github.com/cryptomator/android/releases",           desc:"Encrypt cloud files on-device. Works with Drive, Dropbox.", badge:"foss" },
+    ]
+  },
+  {
+    cat: "🌐 Browser & Network",
+    items: [
+      { name:"Cromite",      icon:"🌐", url:"https://github.com/uazo/cromite/releases",                  desc:"Chromium fork with ad blocking and privacy hardening built-in.", badge:"foss" },
+      { name:"Firefox",      icon:"🌐", url:"https://www.mozilla.org/firefox/android/",                  desc:"uBlock Origin support, open source, best for extensions.", badge:"foss" },
+      { name:"Tor Browser",  icon:"🌐", url:"https://www.torproject.org/download/#android",              desc:"Anonymous browsing via Tor network. No tracking possible.", badge:"foss" },
+      { name:"Automate",     icon:"🌐", url:"https://llamalab.com/automate/",                            desc:"Automation flows. Like Tasker but with flowchart UI." },
+    ]
+  },
+  {
+    cat: "✏️ Code & Dev",
+    items: [
+      { name:"Acode",        icon:"✏️", url:"https://github.com/deadlyjack/Acode/releases",              desc:"Full code editor for Android. Syntax highlight, plugins, terminal.", badge:"must" },
+      { name:"Termux",       icon:"✏️", url:"https://github.com/termux/termux-app/releases",             desc:"Linux terminal + package manager on Android.", badge:"foss" },
+      { name:"aShell You",   icon:"✏️", url:"https://github.com/DP-Hridayan/aShellYou/releases",         desc:"ADB shell GUI on device. Run commands, manage packages.", badge:"foss" },
+    ]
+  },
+  {
+    cat: "🖼️ Image & Media",
+    items: [
+      { name:"Image Toolbox", icon:"🖼️", url:"https://github.com/T8RIN/ImageToolbox/releases/",         desc:"200+ image tools. Resize, convert, background remove, filters.", badge:"must" },
+      { name:"Aves Libre",   icon:"🖼️", url:"https://github.com/deckerst/aves/releases",                desc:"Beautiful gallery app. EXIF viewer, metadata editor.", badge:"foss" },
+      { name:"Seal",         icon:"🖼️", url:"https://github.com/JunkFood02/Seal/releases",              desc:"Download media from any site. yt-dlp powered.", badge:"foss" },
+    ]
+  },
+];
+
+let allCards = [];
+
+function build() {
+  const main = document.getElementById('main');
+  const fbar = document.getElementById('filters');
+  let total = 0;
+
+  const ab = document.createElement('button');
+  ab.className = 'fbtn on'; ab.textContent = 'ALL'; ab.dataset.cat = 'all';
+  fbar.appendChild(ab);
+
+  DATA.forEach(section => {
+    const fb = document.createElement('button');
+    fb.className = 'fbtn'; fb.textContent = section.cat; fb.dataset.cat = section.cat;
+    fbar.appendChild(fb);
+
+    const sec = document.createElement('div');
+    sec.className = 'sec'; sec.dataset.cat = section.cat;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'sec-hdr';
+    hdr.innerHTML = `<span class="sec-title">${section.cat}</span><span class="sec-n">${section.items.length} apps</span>`;
+    sec.appendChild(hdr);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    section.items.forEach(item => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = item.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.dataset.name = item.name.toLowerCase();
+      a.dataset.desc = (item.desc||'').toLowerCase();
+      a.dataset.cat = section.cat;
+
+      a.innerHTML = `
+        <div class="card-name">${item.name}</div>
+        <div class="card-desc">${item.desc||''}</div>
+      `;
+      grid.appendChild(a);
+      allCards.push(a);
+      total++;
+    });
+
+    sec.appendChild(grid);
+    main.appendChild(sec);
+  });
+
+  document.getElementById('hdr-count').textContent = total + ' apps';
+  document.getElementById('ft-count').textContent = total + ' apps total';
+  recount();
+}
+
+function recount() {
+  const v = allCards.filter(c => !c.classList.contains('gone')).length;
+  document.getElementById('cnt').textContent = v + ' apps';
+}
+
+function filterCat(cat) {
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+  document.querySelectorAll('.sec').forEach(s => {
+    s.classList.toggle('gone', cat !== 'all' && s.dataset.cat !== cat);
+  });
+  const q = document.getElementById('srch').value.trim().toLowerCase();
+  q ? doSearch(q) : showAll();
+}
+
+function showAll() {
+  allCards.forEach(c => {
+    c.classList.toggle('gone', c.closest('.sec').classList.contains('gone'));
+  });
+  recount();
+}
+
+function matchesQuery(name, q) {
+  return name.includes(q);
+}
+
+function doSearch(q) {
+  document.querySelectorAll('.sec').forEach(sec => {
+    const catOn = document.querySelector(`.fbtn.on`).dataset.cat;
+    const catHidden = catOn !== 'all' && sec.dataset.cat !== catOn;
+    let anyMatch = false;
+    sec.querySelectorAll('.card').forEach(c => {
+      const match = !catHidden && matchesQuery(c.dataset.name, q);
+      c.classList.toggle('gone', !match);
+      if (match) anyMatch = true;
+    });
+    sec.classList.toggle('gone', catHidden || !anyMatch);
+  });
+  recount();
+}
+
+document.getElementById('srch').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  q ? doSearch(q) : showAll();
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const b = e.target.closest('.fbtn');
+  if (b) filterCat(b.dataset.cat);
+});
+
+build();
+</script>
+</body>
+</html>

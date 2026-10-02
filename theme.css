@@ -1,0 +1,544 @@
+/* ============================================
+   RESTRICTED — control-panel design system
+   shared across apps.html / tools.html / web.html
+
+   Concept: this isn't a marketing site, it's a
+   console. Every page is a panel of entries with
+   a state (stable / experimental / locked). Color
+   carries meaning (status), not decoration.
+
+   Each page sets --mode-label / --mode-glyph if
+   it wants a different corner readout, or
+   overrides tokens below in its own <style>.
+   ============================================ */
+
+:root {
+  /* ground */
+  --bg-a: #0b0d0c;
+  --bg-b: #141715;
+  --surface: #171b18;
+  --surface-hover: #1d2320;
+  --border: #2a302b;
+  --border-hover: #3a4238;
+
+  --ink: #e6ebe5;
+  --muted: #8b948d;
+  --muted-2: #5b645e;
+
+  /* signal — one live color, used like an LED, not a gradient */
+  --signal: #5eff9e;
+  --signal-bright: #9dffc4;
+  --signal-dim: #1f4d38;
+  --on-signal: #05130c;
+  --glow-rgb: 94, 255, 158;
+
+  /* status vocabulary — true states, not extra flavor accents */
+  --ok: #5eff9e;
+  --ok-dim: #1f4d38;
+  --warn: #e8b34d;
+  --warn-dim: #4a3a1a;
+  --err: #ff6b6b;
+  --err-dim: #4a1f1f;
+
+  /* legacy alias so old markup (accent/accent2) doesn't break */
+  --accent: var(--signal);
+  --accent-bright: var(--signal-bright);
+  --accent2: var(--warn);
+  --accent2-bright: #f2c876;
+  --on-accent: var(--on-signal);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(94,255,158,0.03) 0%, transparent 240px),
+    var(--bg-a);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', 'Berkeley Mono', 'JetBrains Mono', ui-monospace, monospace;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+::selection { background: var(--signal-dim); color: var(--signal-bright); }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-a); }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 0; }
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* ===== CORNER READOUT — signature element =====
+   fixed system-status line, bottom-left. quiet,
+   persistent, reinforces "you are in a console." */
+.sys-readout {
+  position: fixed;
+  left: 16px;
+  bottom: 14px;
+  z-index: 200;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sys-readout .led {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 6px var(--signal);
+  animation: pulse 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (max-width: 700px) {
+  .sys-readout { display: none; }
+}
+
+/* ===== HEADER / HERO ===== */
+header, .hero {
+  padding: 48px 40px 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero {
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 56px 40px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* type: monospace display, set in caps with wide tracking —
+   the "brand type moment" is restraint + spacing, not a
+   gradient clip. numbers stay tabular. */
+.logo-word, .hero-title {
+  font-family: 'IBM Plex Mono', 'Berkeley Mono', monospace;
+  font-weight: 700;
+  font-size: clamp(28px, 4.6vw, 42px);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.logo-word::after, .hero-title::after {
+  content: '_';
+  color: var(--signal);
+  animation: blink 1.1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.logo-sub, .hero-eyebrow {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.logo-sub::before, .hero-eyebrow::before {
+  content: '// ';
+  color: var(--signal-dim);
+}
+
+.hero-eyebrow { margin-top: 0; margin-bottom: 14px; }
+
+.header-meta {
+  font-size: 11px;
+  color: var(--muted-2);
+  letter-spacing: 0.3px;
+  text-align: right;
+  line-height: 1.9;
+  font-weight: 500;
+}
+
+.header-meta b { color: var(--signal); font-weight: 700; }
+
+.disclaimer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+  margin-top: 16px;
+}
+
+.disclaimer-pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--warn);
+  box-shadow: 0 0 6px var(--warn);
+  flex-shrink: 0;
+}
+
+/* ===== SEARCH — terminal readout, not a search pill ===== */
+.search-wrap, .sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.search-wrap {
+  margin: 0 40px 0;
+  background: rgba(20, 23, 21, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 13px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-wrap:focus-within {
+  border-color: var(--signal-dim);
+}
+
+.sticky-nav {
+  background: rgba(11, 13, 12, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sticky-nav .search-wrap {
+  margin: 0;
+  flex-shrink: 0;
+  width: 420px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.search-wrap input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.search-wrap input::placeholder { color: var(--muted-2); }
+
+/* prompt glyph replaces the magnifier — this is a command line */
+.search-icon {
+  color: var(--signal);
+  font-size: 14px;
+  font-weight: 700;
+}
+.search-icon::before { content: '>'; }
+
+.pill-count, .count-badge {
+  background: transparent;
+  border: 1px solid var(--border-hover);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== FILTERS ===== */
+.filter-bar, .filter-scroll {
+  padding: 18px 40px 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sticky-nav .filter-scroll {
+  padding: 0;
+  flex: 1;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sticky-nav .filter-scroll::-webkit-scrollbar { display: none; }
+
+.fbtn, .filter-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.fbtn:hover, .filter-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--ink);
+}
+.fbtn.on, .fbtn.active, .filter-btn.active {
+  border-color: var(--signal);
+  background: var(--signal-dim);
+  color: var(--signal-bright);
+  font-weight: 700;
+}
+
+/* ===== MAIN ===== */
+main {
+  padding: 32px 40px 72px;
+  max-width: 1600px;
+}
+
+/* ===== SECTION ===== */
+.sec, .section { margin-bottom: 48px; }
+.sec.gone, .section.hidden { display: none; }
+
+.sec-hdr, .section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* was a glowing dot — now a status-bracket, echoing the
+   card's state-rail language instead of pure ornament */
+.sec-hdr::before, .section-header::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: var(--signal);
+  flex-shrink: 0;
+}
+
+.sec-title, .section-title, .section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sec-line, .section-rule {
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.sec-n, .section-n, .section-count {
+  font-size: 10.5px;
+  color: var(--muted-2);
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.sec-n::before, .section-n::before, .section-count::before { content: '['; }
+.sec-n::after, .section-n::after, .section-count::after { content: ']'; }
+
+/* ===== GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+/* ===== CARD =====
+   sharp corners, hairline seams (grid gap IS the border,
+   like a panel of switches) + a left status-rail encoding
+   real state: stable / experimental / locked. this is the
+   direct replacement for the old glowing-dot decoration. */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-hover);
+  border-radius: 0;
+  padding: 20px 22px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  position: relative;
+}
+
+.card:hover {
+  border-left-color: var(--signal);
+  background: var(--surface-hover);
+}
+
+.card:active { background: var(--bg-a); }
+.card.gone, .card.hidden { display: none; }
+
+/* status modifiers — apply on the card itself when a page
+   wants to mark experimental/deprecated/locked entries */
+.card.is-warn { border-left-color: var(--warn); }
+.card.is-warn:hover { border-left-color: var(--warn); }
+.card.is-err, .card.is-locked { border-left-color: var(--err); }
+.card.is-err:hover, .card.is-locked:hover { border-left-color: var(--err); }
+
+.card-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+
+.card-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+}
+
+.card-name::before { content: none; }
+
+.card-desc {
+  font-size: 12px;
+  font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif;
+  color: var(--muted);
+  line-height: 1.55;
+  position: relative;
+}
+
+.arrow {
+  font-size: 12px;
+  color: var(--muted-2);
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: color 0.15s ease, transform 0.15s ease;
+  font-family: monospace;
+}
+
+.card:hover .arrow {
+  color: var(--signal);
+  transform: translateX(2px);
+}
+
+/* status tag — reads as a real state label, not warm flavor */
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  position: relative;
+}
+
+.card-tag::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+.tag-lofix { color: var(--warn); border-color: var(--warn-dim); }
+.tag-free  { color: var(--signal); border-color: var(--signal-dim); }
+.tag-mine  { color: var(--err); border-color: var(--err-dim); }
+.tag-keyflame { color: #ff6ec7; border-color: #7a2a56; }
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 22px 40px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--muted-2);
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ===== RESPONSIVE =====
+   this is the part that has to be flawless: console
+   metaphor degrades to single-column stacked panel,
+   never smaller than comfortable tap targets. */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  header, .hero { padding: 32px 20px 20px; }
+  .hero { padding: 40px 20px 28px; }
+  .search-wrap { margin: 0 20px; padding: 12px 16px; }
+  .sticky-nav { padding: 10px 20px; gap: 10px; }
+  .sticky-nav .search-wrap { width: 100%; order: 2; }
+  .sticky-nav .filter-scroll { order: 1; width: 100%; }
+  .filter-bar, main, footer { padding-left: 20px; padding-right: 20px; }
+  .grid { grid-template-columns: 1fr; }
+  .header-meta { text-align: left; }
+  footer { flex-direction: column; gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  body { font-size: 13px; }
+  .logo-word, .hero-title { font-size: clamp(24px, 8vw, 30px); }
+  .card { padding: 16px 18px; }
+}
+
+/* print / fallback: never let the console gimmick break content */
+@media (prefers-contrast: more) {
+  :root {
+    --border: #55605a;
+    --muted: #b9c2bc;
+  }
+}
